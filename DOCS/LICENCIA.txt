@@ -1,0 +1,20 @@
+Instalador desatendido para Openstack
+Reynaldo R. Martinez P.
+E-Mail: TigerLinux@Gmail.com
+
+Liberado bajo la licencia GPL V3
+
+Esta pieza de código y todos sus componentes han sido liberados bajo la licencia GPL V3 - Usted puede
+usar, modificar, redistribuir, y especialmente "mejorar" este conjunto de herramientas siempre y cuando
+comparta sus modificaciones con la comunidad de Software Libre (especialmente la de OpenStack) y a su
+vez indique que sus modificaciones fueron basadas sobre mi trabajo original.
+
+Si usted realiza mejoras sobre este conjunto de scripts cuya única función es ayudar a la todos aquellos
+que necesitamos o deseamos aprender de OpenStack, por favor comparta la información tal como otros proyectos
+(devstack, packstack) lo han hecho con toda la comunidad.
+
+Todos los restantes componentes descargados por este conjunto de scripts (OpenStack y todos sus módulos,
+dependencias de linux, etc.) están bajo sus propias licencias.
+
+
+

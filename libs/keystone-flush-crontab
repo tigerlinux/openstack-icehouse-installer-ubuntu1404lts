@@ -1,0 +1,14 @@
+####################################
+#
+SHELL=/bin/bash
+PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+#
+# Instalador desatendido para Openstack sobre CENTOS
+# Reynaldo R. Martinez P.
+# E-Mail: TigerLinux@Gmail.com
+#
+# Script para limpieza de tokens de Keystone
+# Se ejecuta al minuto 02 a cada hora
+#
+
+02 */1 * * * root /usr/local/bin/openstack-keystone-tokenflush.sh > /var/log/keystone-tokens-flush.log

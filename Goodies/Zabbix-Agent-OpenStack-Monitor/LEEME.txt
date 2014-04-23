@@ -1,0 +1,31 @@
+DEFINICION DE VARIABLES PARA MONITOREAR OPENSTACK VIA ZABBIX
+Reynaldo R. Martinez P.
+TigerLinux@gmail.com
+
+Adicionalmente al monitoreo vía SNMP, usted puede implementar las mismas
+variables en ZABBIX. Para ello, se ha incluido en este directorio un archivo
+con las definiciones de variables incluidas en el módulo SNMP convertidas
+a variables implementables en ZABBIX.
+
+Modo de uso:
+
+Cuando instale OpenStack usando este instalador semi automatizado, asegurese
+de usar la opción snmpinstall="yes" en "./configs/main-config.rc". Luego,
+instale (si no lo tiene ya instalado) el agente Zabbix e incluya las
+definiciones del archivo "zabbix_agentd_osvars.conf" en su configuracion
+de agente zabbix (normalmente en /etc/zabbix_agentd.conf).
+
+Las variables definidas aquí son las siguientes:
+
+vm.number.running: Cantidad de VM's en estado "running".
+vm.number.configured: Cantidad de VM's configuradas.
+vm.cpu.percent.usage: Porcentaje de uso de CPU utilizado por las VM's
+vm.ram.percent.usage: Porcentaje de uso de RAM utilizado por las VM's
+vm.ram.bytes.usage: RAM (en Bytes) asignados a las VM's que se están ejecutando
+vm.instance.bytes.usage: Espacio de disco (en bytes) usado por las VM's
+vm.images.bytes.usage: Espacio de disco (en bytes) usado por las imágenes de
+glance.
+
+NOTA: VM's = Virtual Machines. :-)
+
+FIN.-

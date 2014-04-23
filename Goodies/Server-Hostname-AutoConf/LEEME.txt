@@ -1,0 +1,56 @@
+SCRIPT PARA AUTOCONFIGURACION DE HOSTNAME/DOMAINNAME BASADO EN DNS
+Reynaldo R. Martinez P.
+TigerLinux@gmail.com
+
+El presente script tiene como única función automatizar la correcta configuración del
+hostname basado en información obtenida vía DNS !.
+
+Este script requiere que los utilitarios "host" e "ifconfig" estén instalados y accesibles
+al script. Se recomienda colocar este script en el /etc/rc.d/rc.local del servidor para
+ser llamado al finalizar el arranque de todos los servicios.
+
+Modo de uso:
+
+Copie el script "script-autoconfig-server.sh" en el directorio /usr/local/bin y hágalo
+ejecutable (chmod 755 /usr/local/bin/script-autoconfig-server.sh)
+
+Copie el archivo de configuración a /etc/autoconfig-server-options.conf y colóquele
+permisología 644 (chmod 644 /etc/autoconfig-server-options.conf)
+
+Modifique (totalmente opcional) los valores en /etc/autoconfig-server-options.conf
+
+Puede ejecutar el script manualmente, o incluirlo en el "rc.local" para ser ejecutado cada
+vez que el servidor arranque.
+
+Principio de operación:
+
+El script usa distintas llamadas al comando host para tratar de determinar su nombre real
+(fqdn) basado en consultas al DNS. En caso de fallar dichas consultas, coloca como nombre
+"localhost.localdomain". En general, es preferible colocar "localhost.localdomain" que un
+nombre que no pueda ser resuelto vía DNS o vía /etc/hosts.
+
+Esto asume que existe una estructura DNS ya creada con todos los records "A" y "PTR" y que
+los equipos que usan este script tienen acceso a dicha estructura DNS.
+
+Escenario típico de operación:
+
+Este script es una buena medida para escenarios de virtualización en la nube (ej.. OpenStack)
+donde las VM's son levantadas de semillas y luego asignadas con IP's vía "dhcp" (ej. quantum
+dhcp agent / dnsmasq). En una escenario así, y con la estructura de DNS ya creada para cada
+red de VM's de OpenStack, se puede usar este script para que las VM's queden configuradas
+apropiadamente (respecto a "personalidad dns") y así ahorrar el tiempo (y costo) de adecuar
+las VM's una vez levantadas.
+
+Este script adicionalmente puede llamar al cliente puppet (si el mismo está instalado) y
+pasarle como parámetro un servidor puppet (puppet master) para terminar las tareas de
+adecuación inicial del sistema operativo.
+
+Sistemas Operativos soportados por este script:
+
+Este script ha sido diseñado para funcionar en sistemas basados en RHEL 5 y 6 (Centos 5/6,
+Scientific Linux, etc.) y en sistemas basados en Debian 6 y Debian 7.
+
+Ha sido probado también en Fedora 18 y 19, pero el soporte inicial del script es, como ya
+se mencionó, para RHEL5/6 y compatibles y Debian releases 6 y 7.
+
+FIN.-

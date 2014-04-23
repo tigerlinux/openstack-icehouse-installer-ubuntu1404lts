@@ -1,0 +1,44 @@
+SCRIPT PARA INSTALACION Y CONFIGURACION AUTOMATIZADA DEL CLIENTE PUPPET
+Reynaldo R. Martinez P.
+TigerLinux@gmail.com
+
+El presente script tiene como única función la instalación y configuración
+del cliente puppet en servidores RHEL 5/6 (y compatibles) y Debian 6 / 7 y
+compatibles.
+
+El script requiere acceso a Internet ya que instala los repositorios oficiales
+de puppet (para centos y debian), luego instala los paquetes y sus dependencias
+y finalmente deja el cliente puppet configurado para hablar conel servidor puppet
+que es alimentado al script como primer parámetro. Ejemplo:
+
+./puppet-client-install.sh myservidor.enmidominio
+
+Este script adicionalmente requiere que los repositorios del sistema operativo
+estén instalados y alcanzables, y especialmente para el caso de RHEL y com-
+patibles (Centos, Scientific Linux, etc.) se requiere que esté instalado y
+funcional el repositorio EPEL (http://fedoraproject.org/wiki/EPEL).
+
+En caso de no tener EPEL instalado, la ruta al RPM del repositorio puede ser
+pasada al script como segundo parámetro. Ejemplo:
+
+./puppet-client-install.sh \
+	myservidorpuppet.enmidominio \
+	http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+
+NOTA: Si usted tiene sus propios repositorios internos de Epel, puppet, etc.,
+      modifique el script para usarlos en lugar de los Oficiales.
+
+
+Escenarios de uso:
+
+Creación de semillas (imágenes) para ambientes de virtualización en la nube (como
+OpenStack por ejemplo).
+
+Este script puede ser utilizado para que las semillas tengan pre-configurado el
+cliente puppet contra un servidor específico dentro de "la nube" (o el datacenter)
+y una vez que arranquen como VM's, puedan ser configuradas rápidamente desde el
+puppet master.
+
+FIN.-
+
+

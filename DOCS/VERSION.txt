@@ -1,0 +1,5 @@
+Version del instalador:
+
+1.0.0.ub1404lts "Snow Lynx"
+
+SOLO PARA OPENSTACK ICEHOUSE !!!

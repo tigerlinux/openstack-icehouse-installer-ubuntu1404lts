@@ -1,0 +1,73 @@
+#
+# Monitoreo de variables específicas de OpenStack
+# incluyendo servicios compatibles con net-snmp prtable
+# NOTA: No todos los servicios de OpenStack son monitoreables
+# vía prtable
+#
+
+#
+# Servicios monitoreables via PRTABLE de net-snmp
+#
+proc apache2
+proc memcached
+proc ovs-vswitchd
+proc keystone-all
+proc glance-api
+proc glance-registry
+proc cinder-api
+proc cinder-volume
+proc nova-api
+proc nova-cert
+proc nova-scheduler
+proc nova-conductor
+proc nova-novncproxy
+proc nova-compute
+proc ceilometer-api
+proc mongod
+proc mysqld
+proc mysql
+proc postgres
+
+#
+# Variables monitoreables vía extend
+#
+
+extend .1.20 node-cpu-monitor /bin/cat /var/tmp/node-cpu.txt
+extend .1.21 node-ram-monitor /bin/cat /var/tmp/node-memory.txt
+extend .1.22 vm-number-by-states /bin/cat /var/tmp/vm-number-by-states.txt
+extend .1.23 vm-cpu-ram-usage-percent /bin/cat /var/tmp/vm-cpu-ram.txt
+extend .1.24 vm-space-glance-and-nova /bin/cat /var/tmp/vm-disk.txt
+
+#
+# Explicacion de estas variables:
+#
+# Variables en arbol .1.20 - cuatro variables:
+#	- Primera variable: Porcentaje de uso CPU-User
+#	- Segunda variable: Porcentaje de uso CPU-System
+#	- Tercera variable: Porcentaje libre del CPU (CPU-Idle)
+#	- Cuarta variable: Porcentaje del CPU en W-I/O (Waiting for Input/Output)
+#
+# Variables en arbol .1.21
+#	- Primera variable: Buffers utilizados (en Bytes)
+#	- Segunda variable: Cache utilizado (en Bytes)
+#	- Tercera variable: Otros tipos de memoria utilizado (en Bytes)
+#	- Cuarta variable: Memoria física Libre (en Bytes)
+#	- Quinta variable: Memoria SWAP Asignada (en Bytes)
+#	- Sexta variable: Memoria SWAP Utilizada (en Bytes)
+#
+# Variables arbol .1.22
+#	- Primera variable: VM's en estado "running"
+#	- Segunda variable: VM's en estado "shut off"
+#	- Tercera variable: VM's en estado "paused"
+#	- Cuarta variable: VM's en otros estados desconocidos
+#	- Quinta variable: Total de VM's configuradas en el Nodo
+#
+# Variables arbol .1.23
+#	- Primera variable: % de uso CPU de todas las VM's
+#	- Segunda variable: % de uso de RAM Física de todas las VM's
+#	- Tercera variable: Total (en bytes) de memoria asignada a las VM's
+#
+# Variables arbol .1.24
+#	- Primera variable: Uso de disco (en bytes) de las instancias (nova)
+#	- Segunda variable: Uso de disco (en bytes) de las imágenes (glance)
+# 

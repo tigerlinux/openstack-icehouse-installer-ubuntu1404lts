@@ -1,0 +1,61 @@
+NOTAS IMPORTANTES !!
+
+Asegurese de tener conocimientos de los siguientes temas:
+
+- Administración de Linux.
+- Virtualización en Linux con kvm/qemu/libvirt.
+- LinuxBridge y OpenVSwitch.
+- Linux NameSpaces.
+- Redes en general.
+- OpenStack.
+- NFS, GlusterFS.
+- Instalación "correcta" de Ubuntu 14.04 LTS.
+
+Este instalador es SOLAMENTE para UNBUNTU 14.04 LTS de 64 bits (x86_64 / amd64). No intente usarlo en otro ambiente.
+
+1.- Repositorios e instalación Base de Ubuntu Server 14.04 LTS:
+
+Asegurese de tener los repositorios de Ubuntu 14.04 LTS tal como vienen por defecto. Instale el servidor con las opciones normales e incluya como único paquete extra "OpenSSH Server".
+
+Asegúrese de tener actualizado el servidor:
+
+apt-get update
+apt-get -y upgrade
+
+Los repositorios oficiales de Ubuntu 14.04 LTS ya tienen todos los paquetes de OpenStack actualizados (ICEHOUSE 2014.x) por lo tanto no se requiere agregar repositorios extras.
+
+
+2.- System Control (/etc/sysctl.conf).
+
+ALERTA: Esto es SUMAMENTE importante !. Asegúrese de tener los siguientes items configurados en el archivo /etc/sysctl.conf:
+
+net.ipv4.ip_forward=1
+net.ipv4.conf.all.rp_filter=0
+net.ipv4.conf.default.rp_filter=0
+
+Si no los tiene configurados, colóquelos/cambielos y luego reinice la máquina !!
+
+
+3.- OpenVSWITCH:
+
+Instale primero openvswitch. Ejecute los comandos a continuación (luego de colocar los repositorios indicados anteriormente):
+
+apt-get -y install openvswitch-switch python-openvswitch
+
+
+/etc/init.d/openvswitch-switch restart
+
+Luego configure su switch:
+
+Primer paso: br-int (switch de integración de OpenStack):
+
+ovs-vsctl add-br br-int
+
+Siguiente paso: br-ethX (switch para las redes de OpenStack). Ejempo para "eth2":
+
+ovs-vsctl add-br br-eth2
+ovs-vsctl add-port br-eth2 eth2
+
+NOTA: Trate siempre de usar una interfaz que esté LIBRE y pueda ser "dedicada" para OpenStack. Para otras configuraciones, consulte la información que está disponible en Internet. No es necesario colocar las interfaces asociadas a los switches en /etc/network/interfaces, a menos que las tenga "compartidas" y no dedicadas para OpenStack.
+
+

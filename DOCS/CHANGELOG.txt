@@ -1,0 +1,9 @@
+1.0.0.ub1404lts - 23-Abril-2014
+- Cambios generales para adaptar el instalador original
+  para Havana en la nueva versión (Icehouse).
+- Se cambia nuestro message broker por defecto a RabbitMQ.
+- Todos los módulos probados y operativos.
+- Se usa ML2 en lugar de OVS como plugin principal de
+  neutron.
+- Todas las configuraciones se realizan vía "crudini".
+

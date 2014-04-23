@@ -1,0 +1,30 @@
+SCRIPT PARA AUTOCONFIGURACION DE KEY SSH Y PASSWORD DE ROOT BASADO EN
+METADATA DE OPENSTACK DISPONIBLE VIA CONFIG DRIVE.
+Reynaldo R. Martinez P.
+TigerLinux@gmail.com
+
+El presente script tiene como única función automatizar la inclusión del key
+SSH y password de Root siempre y cuando hayan sido definidos en la metadata
+de una máquina virtual al momento de crearla en OpenStack.
+
+El script montará el config-drive (si está disponible), leera el password
+administrativo de root y su key (si están disponibles) y los aprovisionará
+en la máquina virtual.
+
+NOTA IMPORTANTE: Si no se coloca un password administrativo en la definición
+de la máquna virtual en en Dashboard (o en Nova), OpenStack generará uno
+aleatorio.
+
+Modo de uso:
+
+Copie el script "metadata-provision.sh" en el directorio /usr/local/bin
+y hágalo ejecutable (chmod 755 /usr/local/bin/metadata-provision.sh)
+
+Incluya una llamada al script en el /etc/rc.local si quiere que sea ejecutado
+al inicio de la máquina virtual. El script una vez que lea la metadata y
+aprovisione los datos necesarios (password y key para el usuario root), creará
+un archivo de control "/etc/metadata-provision-already-ran.conf" para que
+subsiguientes llamadas al script aborten su ejecución (es decir, no vuelva
+a intentar re-aprovisionar los mismos datos).
+
+FIN.-
