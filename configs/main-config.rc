@@ -11,8 +11,8 @@
 # Primera versión para Icehouse (ubuntu): Abril 23 del 2014
 #
 # Archivo de configuracion principal
-# Para el instalador versión 1.0.0.ub1404lts "Snow Lynx"
-# Abril 23, 2014
+# Para el instalador versión 1.0.1.ub1404lts "Snow Lynx"
+# Abril 26, 2014
 #
 
 #
@@ -337,12 +337,26 @@ extranovahosts=""
 # Datos para sobre-suscripción de CPU y RAM en los nodos de compute
 ram_allocation_ratio="1.5"
 cpu_allocation_ratio="16.0"
-# Servidor SPICE - En Ubuntu usamos Spice en lugar de NoVNC
+#
+# A partir del instalador para Ubuntu, damos la opción de instalar VNC o Spice
+# La siguiente variable controla que sabor de consola se va a usar.
+# Coloque "spice" para SpiceHTML5, o "vnc" para NoVNC
+# Por defecto: vnc
+consoleflavor="vnc"
+# Servidor SPICE
 # Esta es la IP que debe pertenecer al controller o nodo NOVA de control
 # En una configuración all-in-one, esa la misma del novahost, pero en una
 # configuración con múltiples nodos de compute, debe ser la IP del controller
 # o donde se ejecuta el nodo principal de NOVA
 spiceserver_controller_address="192.168.50.12"
+# Servidor VNC
+# Esta es la IP que debe pertenecer al controller o nodo NOVA de control
+# En una configuración all-in-one, esa la misma del novahost, pero en una
+# configuración con múltiples nodos de compute, debe ser la IP del controller
+# o donde se ejecuta el nodo principal de NOVA
+vncserver_controller_address="192.168.50.12"
+# Keymap: Valores válidos: us y es
+vnc_keymap="es"
 #
 # Si el valor siguiente es yes, Nova creará
 # los grupos de seguridad por defecto para dar acceso

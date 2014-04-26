@@ -1,3 +1,9 @@
+1.0.1.ub1404lts - 26-Abril-2014
+- Correcciones menores en scripts de monitoreo.
+- Se agrega la posibilidad de seleccionar el manejador
+  de consola (vnc o spice) desde la configuración del
+  instalador.
+
 1.0.0.ub1404lts - 23-Abril-2014
 - Cambios generales para adaptar el instalador original
   para Havana en la nueva versión (Icehouse).

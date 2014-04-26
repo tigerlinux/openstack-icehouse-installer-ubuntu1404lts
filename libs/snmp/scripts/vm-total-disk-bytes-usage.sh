@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-# Instalador desatendido para Openstack sobre CENTOS
+# Instalador desatendido para Openstack sobre UBUNTU
 # Reynaldo R. Martinez P.
 # E-Mail: TigerLinux@Gmail.com
-# Julio del 2013
+# Abril del 2014
 #
 # Script para monitoreo del uso de disco (bytes) de las VM's
 # y de las imagenes de glance

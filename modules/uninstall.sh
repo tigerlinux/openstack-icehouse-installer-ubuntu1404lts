@@ -109,12 +109,15 @@ aptitude -y purge virt-top ceilometer-agent-central ceilometer-agent-compute cei
 	libqpidcommon2 libqpidtypes1 python-cqpid python-qpid python-qpid-extras-qmf qpid-client \
 	qpid-tools qpid-doc qemu kvm qemu-kvm libvirt-bin libvirt-doc rabbitmq-server \
 	heat-api heat-api-cfn heat-engine neutron-plugin-ml2 python-guestfs heat-cfntools \
-	heat-common
+	heat-common nova-spiceproxy nova-novncproxy
 
 aptitude -y purge python-openstack.nose-plugin  python-oslo.sphinx python-oslosphinx
 
 aptitude -y purge qemu-utils qemu-system qemu-utils ipxe-qemu qemu-keymaps qemu-system-x86 qemu-user \
 	libguestfs0 qemu-system-common
+
+aptitude -y purge ceilometer-agent-notification ceilometer-alarm-evaluator ceilometer-alarm-notifier \
+	neutron-metering-agent
 
 apt-get -y autoremove
 

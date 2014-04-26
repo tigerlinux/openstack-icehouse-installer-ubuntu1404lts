@@ -175,6 +175,17 @@ else
 	nova_kvm_or_qemu="nova-compute-kvm"
 fi
 
+case $consoleflavor in
+"spice")
+	consolepackage="nova-spiceproxy"
+	consolesvc="nova-spiceproxy"
+	;;
+"vnc")
+	consolepackage="nova-novncproxy"
+	consolesvc="nova-novncproxy"
+	;;
+esac
+
 if [ $nova_in_compute_node = "no" ]
 then
 	aptitude -y install $nova_kvm_or_qemu \
@@ -188,7 +199,7 @@ then
 		nova-doc \
 		nova-scheduler \
 		nova-volume \
-		nova-spiceproxy \
+		$consolepackage \
 		python-novaclient \
 		liblapack3gf \
 		python-gtk-vnc \
@@ -212,14 +223,10 @@ stop nova-console
 stop nova-console
 stop nova-consoleauth
 stop nova-consoleauth
-stop nova-spiceproxy
-stop nova-spiceproxy
+stop $consolesvc
+stop $consolesvc
 stop nova-compute
 stop nova-compute
-# stop nova-novncproxy
-# stop nova-novncproxy
-# stop nova-xenvncproxy
-# stop nova-xenvncproxy
 
 source $keystone_admin_rc_file
 
@@ -387,7 +394,42 @@ crudini --set /etc/nova/nova.conf DEFAULT linuxnet_ovs_integration_bridge $integ
 # crudini --set /etc/nova/nova.conf DEFAULT libvirt_ovs_bridge $integration_bridge
 crudini --set /etc/nova/nova.conf DEFAULT neutron_ovs_bridge $integration_bridge
 # crudini --set /etc/nova/nova.conf DEFAULT dhcp_options_enabled True
- 
+
+case $consoleflavor in
+"vnc")
+	crudini --set /etc/nova/nova.conf DEFAULT vnc_enabled True
+	crudini --set /etc/nova/nova.conf DEFAULT novncproxy_host 0.0.0.0
+	crudini --set /etc/nova/nova.conf DEFAULT vncserver_proxyclient_address $novahost
+	crudini --set /etc/nova/nova.conf DEFAULT novncproxy_base_url "http://$vncserver_controller_address:6080/vnc_auto.html"
+	crudini --set /etc/nova/nova.conf DEFAULT novncproxy_port 6080
+	crudini --set /etc/nova/nova.conf DEFAULT vncserver_listen $novahost
+	crudini --set /etc/nova/nova.conf DEFAULT vnc_keymap $vnc_keymap
+	crudini --del /etc/nova/nova.conf spice html5proxy_base_url
+	crudini --del /etc/nova/nova.conf spice server_listen
+	crudini --del /etc/nova/nova.conf spice server_proxyclient_address
+	crudini --del /etc/nova/nova.conf spice keymap
+        crudini --set /etc/nova/nova.conf spice agent_enabled False
+        crudini --set /etc/nova/nova.conf spice enabled False
+	;;
+"spice")
+	crudini --del /etc/nova/nova.conf DEFAULT novncproxy_host
+	crudini --del /etc/nova/nova.conf DEFAULT vncserver_proxyclient_address
+	crudini --del /etc/nova/nova.conf DEFAULT novncproxy_base_url
+	crudini --del /etc/nova/nova.conf DEFAULT novncproxy_port
+	crudini --del /etc/nova/nova.conf DEFAULT vncserver_listen
+	crudini --del /etc/nova/nova.conf DEFAULT vnc_keymap
+
+	crudini --set /etc/nova/nova.conf DEFAULT vnc_enabled False
+	crudini --set /etc/nova/nova.conf DEFAULT novnc_enabled False
+
+	crudini --set /etc/nova/nova.conf spice html5proxy_base_url "http://$spiceserver_controller_address:6082/spice_auto.html"
+	crudini --set /etc/nova/nova.conf spice server_listen 0.0.0.0
+	crudini --set /etc/nova/nova.conf spice server_proxyclient_address $novahost
+	crudini --set /etc/nova/nova.conf spice enabled True
+	crudini --set /etc/nova/nova.conf spice agent_enabled True
+	crudini --set /etc/nova/nova.conf spice keymap en-us
+	;;
+esac 
 
 case $brokerflavor in
 "qpid")
@@ -422,25 +464,6 @@ esac
 sync
 sleep 5
 sync
-
-# Para la versión de UBUNTU, se usará SPICE - En ubuntu y debian usamos Spice.
-#
-crudini --del /etc/nova/nova.conf novncproxy_host
-crudini --del /etc/nova/nova.conf vncserver_proxyclient_address
-crudini --del /etc/nova/nova.conf novncproxy_base_url
-crudini --del /etc/nova/nova.conf novncproxy_port
-crudini --del /etc/nova/nova.conf vncserver_listen
-crudini --del /etc/nova/nova.conf vnc_keymap
-
-crudini --set /etc/nova/nova.conf DEFAULT vnc_enabled False
-crudini --set /etc/nova/nova.conf DEFAULT novnc_enabled False
-
-crudini --set /etc/nova/nova.conf spice html5proxy_base_url "http://$spiceserver_controller_address:6082/spice_auto.html"
-crudini --set /etc/nova/nova.conf spice server_listen 0.0.0.0
-crudini --set /etc/nova/nova.conf spice server_proxyclient_address $novahost
-crudini --set /etc/nova/nova.conf spice enabled True
-crudini --set /etc/nova/nova.conf spice agent_enabled True
-crudini --set /etc/nova/nova.conf spice keymap en-us
 
 
 sed -r -i 's/NOVA_ENABLE\=false/NOVA_ENABLE\=true/' /etc/default/nova-common
@@ -490,7 +513,7 @@ then
 	start nova-conductor
 	start nova-console
 	start nova-consoleauth
-	start nova-spiceproxy
+	start $consolesvc
 
 	if [ $nova_without_compute = "no" ]
 	then
@@ -500,7 +523,6 @@ then
 		echo 'manual' > /etc/init/nova-compute.override
 	fi
 
-	echo 'manual' > /etc/init/nova-novncproxy.override
 	echo 'manual' > /etc/init/nova-xenvncproxy.override
 else
 	start nova-compute
@@ -565,6 +587,7 @@ then
 else
 	date > /etc/openstack-control-script-config/nova-installed
 	date > /etc/openstack-control-script-config/nova
+	echo "$consolesvc" > /etc/openstack-control-script-config/nova-console-svc
 	if [ $nova_in_compute_node = "no" ]
 	then
 		date > /etc/openstack-control-script-config/nova-full-installed
