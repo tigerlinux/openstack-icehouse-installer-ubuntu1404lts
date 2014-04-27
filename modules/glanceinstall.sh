@@ -368,19 +368,19 @@ then
 	sleep 10
 	sync
 
-	glance image-create --name="Cirros 0.3.1 32 bits" \
+	glance image-create --name="Cirros 0.3.2 32 bits" \
 		--disk-format=qcow2 \
 		--is-public true \
-		--container-format bare < ./libs/cirros/cirros-0.3.1-i386-disk.img
+		--container-format bare < ./libs/cirros/cirros-0.3.2-i386-disk.img
 
 	sync
 	sleep 10
 	sync
 
-	glance image-create --name="Cirros 0.3.1 64 bits" \
+	glance image-create --name="Cirros 0.3.2 64 bits" \
 		--disk-format=qcow2 \
 		--is-public true \
-		--container-format bare < ./libs/cirros/cirros-0.3.1-x86_64-disk.img
+		--container-format bare < ./libs/cirros/cirros-0.3.2-x86_64-disk.img
 
 	sync
 	sleep 5

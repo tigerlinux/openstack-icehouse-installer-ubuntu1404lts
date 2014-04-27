@@ -285,7 +285,7 @@ crudini --set /etc/neutron/neutron.conf DEFAULT core_plugin ml2
 crudini --set /etc/neutron/neutron.conf DEFAULT auth_strategy keystone
 crudini --set /etc/neutron/neutron.conf DEFAULT base_mac "$basemacspec"
 crudini --set /etc/neutron/neutron.conf DEFAULT mac_generation_retries 16
-crudini --set /etc/neutron/neutron.conf DEFAULT dhcp_lease_duration 120
+crudini --set /etc/neutron/neutron.conf DEFAULT dhcp_lease_duration $dhcp_lease_duration
 crudini --set /etc/neutron/neutron.conf DEFAULT allow_bulk True
 crudini --set /etc/neutron/neutron.conf DEFAULT allow_overlapping_ips False
 crudini --set /etc/neutron/neutron.conf DEFAULT control_exchange neutron

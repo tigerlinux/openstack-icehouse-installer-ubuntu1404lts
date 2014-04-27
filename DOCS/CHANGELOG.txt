@@ -1,3 +1,9 @@
+1.0.2.ub1404lts - 27-Abril-2014
+- Se cambian las imágenes de Cirros a V 0.3.2.
+- Se coloca la opción (controlable en la config
+  del instalador) de cambiar el lease-time para
+  el agente DHCP de Neutron.
+
 1.0.1.ub1404lts - 26-Abril-2014
 - Correcciones menores en scripts de monitoreo.
 - Se agrega la posibilidad de seleccionar el manejador

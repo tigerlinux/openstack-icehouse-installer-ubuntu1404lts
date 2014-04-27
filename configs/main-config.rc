@@ -11,8 +11,8 @@
 # Primera versión para Icehouse (ubuntu): Abril 23 del 2014
 #
 # Archivo de configuracion principal
-# Para el instalador versión 1.0.1.ub1404lts "Snow Lynx"
-# Abril 26, 2014
+# Para el instalador versión 1.0.2.ub1404lts "Snow Lynx"
+# Abril 27, 2014
 #
 
 #
@@ -267,6 +267,8 @@ dhcp_domain="localdomain"
 metadata_shared_secret="P@ssw0rd"
 # MAC base para las VM's
 basemacspec="fa:16:3e:00:00:00"
+# Duración en segundos para los leases
+dhcp_lease_duration="7200"
 # Solo para la base de datos:
 # Si se van a tener varios hosts de neutron, colocar aquí las IP's
 # para el acceso de la base de datos - sólo efectivo cuando el backend
