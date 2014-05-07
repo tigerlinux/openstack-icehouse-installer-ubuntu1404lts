@@ -230,6 +230,21 @@ then
 		sleep 5
 		sync
 
+                echo "Creando database de trove"
+                echo "CREATE DATABASE $trovedbname default character set utf8;"|$mysqlcommand
+                echo "GRANT ALL ON $trovedbname.* TO '$trovedbuser'@'%' IDENTIFIED BY '$trovedbpass';"|$mysqlcommand
+                echo "GRANT ALL ON $trovedbname.* TO '$trovedbuser'@'localhost' IDENTIFIED BY '$trovedbpass';"|$mysqlcommand
+                echo "GRANT ALL ON $trovedbname.* TO '$trovedbuser'@'$trovehost' IDENTIFIED BY '$trovedbpass';"|$mysqlcommand
+                for extrahost in $extratrovehosts
+                do
+                        echo "GRANT ALL ON $trovedbname.* TO '$trovedbuser'@'$extrahost' IDENTIFIED BY '$trovedbpass';"|$mysqlcommand
+                done
+                echo "FLUSH PRIVILEGES;"|$mysqlcommand
+                sync
+                sleep 5
+                sync
+
+
 		echo ""
 		echo "Lista de databases instaladas:"
 		echo "show databases;"|$mysqlcommand
@@ -314,6 +329,16 @@ then
 		sync
 		sleep 5
 		sync
+
+                echo "Creando database de trove" 
+                echo "CREATE user $trovedbuser;"|$psqlcommand
+                echo "ALTER user $trovedbuser with password '$trovedbpass'"|$psqlcommand
+                echo "CREATE DATABASE $trovedbname"|$psqlcommand
+                echo "GRANT ALL PRIVILEGES ON database $trovedbname TO $trovedbuser;"|$psqlcommand
+                sync
+                sleep 5
+                sync
+
 
 		echo ""
 		echo "Lista de databases instaladas:"

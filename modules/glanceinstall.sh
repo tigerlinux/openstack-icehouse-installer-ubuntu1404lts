@@ -389,7 +389,7 @@ then
 	glance image-list
 
 	echo ""
-	echo "Imágenes de cirros 0.3.1 para 32 y 64 bits creadas"
+	echo "Imágenes de cirros 0.3.2 para 32 y 64 bits creadas"
 	echo ""
 fi
 

@@ -1,3 +1,9 @@
+1.1.0.ub1404lts - 07-Mayo-2014
+- Se agrega Trove como opción para instalación en
+  calidad de "Experimental".
+- Se agrega documentación adicional con respecto
+  al módulo de trove.
+
 1.0.2.ub1404lts - 27-Abril-2014
 - Se cambian las imágenes de Cirros a V 0.3.2.
 - Se coloca la opción (controlable en la config

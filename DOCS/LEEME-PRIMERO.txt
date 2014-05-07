@@ -194,10 +194,26 @@ tienen un messaje broker instalado, pueden ocurrir conflictos que prevengan el
 correcto funcionamiento de la instalación.
 
 
+### Administrador de Consola (NOVNC/SPICEHTML5)
+
+Mediante una opción configurable en ./configs/main-config.rc (consoleflavor), usted
+puede elegir que administrador de consola a usar (NoVNC o SpiceHTML5). Le sugerimos
+usar NoVNC que da menos problemas con configuraciones de teclado no us-english y es
+mas fácil de reconfigurar para SSL.
+
+
+### Trove
+
+Este instalador tiene la opción de instalar Trove (ya estable a partir de OS-Icehouse). El
+módulo de instalación de Trove hace la configuración base de Trove pero NO CREA las imágenes
+ni reconfigura los datastores para dichas imágenes. Eso le toca a usted como administrador
+de la nube de OpenStack (jejeje).
+
+
 ### Scripts de Ayuda
 
-Este instalador colocará en /usr/local/bin un script de ayuda para poder levantar, bajar, desactivar,
-activar los servicios de openstack:
+Este instalador colocará en /usr/local/bin un script de ayuda para poder levantar, bajar,
+desactivar, activar los servicios de openstack:
 
 ```bash
 openstack-control.sh OPCIÓN
@@ -301,6 +317,7 @@ serán instalados):
 * novainstall.sh
 * ceilometerinstall.sh
 * heatinstall.sh
+* troveinstall.sh
 * snmpinstall.sh
 * horizoninstall.sh
 * postinstall.sh

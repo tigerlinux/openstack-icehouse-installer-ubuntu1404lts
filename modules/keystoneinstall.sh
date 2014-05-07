@@ -313,6 +313,27 @@ then
 	./modules/keystone-heat.sh
 fi
 
+case $dbflavor in
+"mysql")
+        if [ $troveinstall == "yes" ]
+        then
+                ./modules/keystone-trove.sh
+        fi
+        ;;
+"postgres")
+        if [ $troveinstall == "yes" ]
+        then
+                echo ""
+                echo "Ha seleccionado instalar trove con DBFlavor = postgres"
+                echo "nuestro instalado aun no soporta dicha opción"
+                echo "Se continuará el proceso de Keystone pero no se crearán"
+                echo "entradas para Trove"
+                echo ""
+        fi
+        ;;
+esac
+
+
 ./modules/keystone-extratenants.sh
 
 date > /etc/openstack-control-script-config/keystone-extra-idents

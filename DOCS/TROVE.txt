@@ -1,0 +1,87 @@
+=============================================================================
+
+IMPORTANTE: CONSIDERE EL SOPORTE DE TROVE COMO "EXPERIMENTAL" EN NUESTRO INSTALADOR
+SEMI AUTOMATIZADO PARA OPENSTACK.
+
+NOTA ADICIONAL SOBRE FLAVORS: 
+
+Si usted crea un nuevo "flavor", no deje que el ID se coloque en "AUTO", colóque un ID numérico o de
+lo contrario el comando "trove flavor-list" fallará y usted no podrá usar trove !. Aun no sabemos si
+esto es un BUG, una limitación o un (jejeje) "FEATURE". Está advertido !!.
+
+Ejemplo de creación de una instancia de trove
+
+(se asume que ya existen creadas imágenes preparadas con el agente de trove según la documentación en:
+
+http://docs.openstack.org/icehouse/install-guide/install/apt/content/ch_trove.html
+http://docs.openstack.org/icehouse/install-guide/install/apt-debian/content/ch_trove.html
+http://docs.openstack.org/icehouse/install-guide/install/yum/content/ch_trove.html
+
+(se asume también que usted tiene su red de neutron con subred ya creadas)
+
+NOTA SUPER IMPORTANTE: Si la imagen NO TIENE bien configurado el agente de trove, es posible que la instancia creada
+con dicha imagen se quede para siempre en "BUILD" o termine en ERROR. Es VITAL que las imágenes tengan la correcta
+configuración del agente !.
+
+SOLO MYSQL: Por los momentos, nuestro módulo de instalación de Trove solo soporta backend de base de datos MySQL.
+Si usted selecciona PostgreSQL como backend, el módulo de trove no hará la instalación pero tampoco abortará el
+proceso completo de instalar OpenStack... simplemente, pasará por alto instalar Trove !.
+
+1.- Se cargan las variables de acceso al servicio de identidades:
+
+source /root/keystonerc_admin
+
+
+2.- Se obtiene la lista de imágenes con los ID's con glance image-list y los ID's de los flavors con nova flavor-list:
+
+
+glance image-list
++--------------------------------------+----------------------+-------------+------------------+----------+--------+
+| ID                                   | Name                 | Disk Format | Container Format | Size     | Status |
++--------------------------------------+----------------------+-------------+------------------+----------+--------+
+| bd7e2a2f-0180-4230-a7fd-b607399f375c | Cirros 0.3.2 32 bits | qcow2       | bare             | 12336128 | active |
+| 23647c77-cd03-4de4-bbeb-2dbd869312df | Cirros 0.3.2 64 bits | qcow2       | bare             | 13167616 | active |
++--------------------------------------+----------------------+-------------+------------------+----------+--------+
+
+nova flavor-list
++----+-----------+-----------+------+-----------+------+-------+-------------+-----------+
+| ID | Name      | Memory_MB | Disk | Ephemeral | Swap | VCPUs | RXTX_Factor | Is_Public |
++----+-----------+-----------+------+-----------+------+-------+-------------+-----------+
+| 1  | m1.tiny   | 512       | 1    | 0         |      | 1     | 1.0         | True      |
+| 2  | m1.small  | 2048      | 20   | 0         |      | 1     | 1.0         | True      |
+| 3  | m1.medium | 4096      | 40   | 0         |      | 2     | 1.0         | True      |
+| 4  | m1.large  | 8192      | 80   | 0         |      | 4     | 1.0         | True      |
+| 5  | m1.xlarge | 16384     | 160  | 0         |      | 8     | 1.0         | True      |
++----+-----------+-----------+------+-----------+------+-------+-------------+-----------+
+
+3.- Se crea el datastore para la imagen seleccionada (con glance image-list):
+
+Comando:
+trove-manage --config-file=/etc/trove/trove.conf datastore_version_update mysql mysql-5.5 mysql GLANCE_IMAGE_ID mysql-server-5.5 1
+
+Ejemplo:
+trove-manage --config-file=/etc/trove/trove.conf datastore_version_update mysql mysql-5.5 mysql bd7e2a2f-0180-4230-a7fd-b607399f375c mysql-server-5.5 1
+
+4.- Se actualiza la versión por defecto del datastore mysql con trove-manage:
+
+trove-manage --config-file=/etc/trove/trove.conf datastore_update mysql mysql-5.5
+
+Datastore version 'mysql-5.5' updated.
+
+
+5. En horizon o en la linea de comando, se crea la instancia:
+
+trove create NOMBRE_INSTANCIA FLAVOR --database=NOMBRE_DB --users USUARIO:PASSWORD
+
+Ejemplo:
+
+trove create MiVMconDB 1 --size=2 --databases=db01 --users admin:P@ssw0rd
+
+
+NOTAS IMPORTANTES:
+
+Hasta el momento de incluir el módulo de trove en el instalador de la comunidad
+OpenStackVE, aun hay algunas lagunas en la documentación de trove.
+
+Se sugiere no considerar el servicio DbaaS aun como "producción" hasta que la
+documentación esté realmente al día y los paquetes hayan madurado lo suficiente.

@@ -3,6 +3,6 @@ Pendientes:
 * Considerar a futuro incluir un portal de automonitoreo vía MRTG con
   autenticación http (htpasswd).
 * Incluir la opción de colocar todos los servicios sobre SSL.
-* Incluir el módulo de instalación y configuración de Trove.
 * Verificar de nuevo el proceso de instalación de Swift.
 * Limpiar un poco la lista de dependencias.
+* Hacer mas pruebas con Trove.

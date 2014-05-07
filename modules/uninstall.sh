@@ -109,7 +109,8 @@ aptitude -y purge virt-top ceilometer-agent-central ceilometer-agent-compute cei
 	libqpidcommon2 libqpidtypes1 python-cqpid python-qpid python-qpid-extras-qmf qpid-client \
 	qpid-tools qpid-doc qemu kvm qemu-kvm libvirt-bin libvirt-doc rabbitmq-server \
 	heat-api heat-api-cfn heat-engine neutron-plugin-ml2 python-guestfs heat-cfntools \
-	heat-common nova-spiceproxy nova-novncproxy
+	heat-common nova-spiceproxy nova-novncproxy python-trove python-troveclient trove-common \
+	trove-api trove-taskmanager
 
 aptitude -y purge python-openstack.nose-plugin  python-oslo.sphinx python-oslosphinx
 
@@ -144,6 +145,7 @@ userdel -f -r ceilometer
 userdel -f -r swift
 userdel -r -f rabbitmq
 userdel -r -f heat
+userdel -r -f trove
 
 echo "Eliminando Archivos remanentes"
 
@@ -192,7 +194,11 @@ rm -fr  /etc/qpid \
 	/var/lib/keystone-signing-swift \
 	$dnsmasq_config_file \
 	/etc/dnsmasq-neutron.d \
-	/etc/init.d/tgtd
+	/etc/init.d/tgtd \
+	/etc/trove \
+	/var/lib/trove \
+	/var/cache/trove \
+	/var/log/trove
 
 
 

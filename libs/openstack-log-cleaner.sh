@@ -48,6 +48,7 @@ logdirs='
 	/var/log/horizon
 	/var/log/keystone
 	/var/log/heat
+	/var/log/trove
 '
 
 for logdirectory in $logdirs

@@ -5,7 +5,7 @@
 # E-Mail: TigerLinux@Gmail.com
 # Abril del 2014
 #
-# Script de instalacion y preparacion de Heat
+# Script de instalacion y preparacion de Trove
 #
 
 PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
@@ -50,7 +50,7 @@ else
 	exit 0
 fi
 
-if [ -f /etc/openstack-control-script-config/heat-installed ]
+if [ -f /etc/openstack-control-script-config/trove-installed ]
 then
 	echo ""
 	echo "Este módulo ya fue ejecutado de manera exitosa - saliendo"
@@ -81,7 +81,7 @@ echo "glance-common glance/admin-tenant-name string $keystoneadmintenant" >> /tm
 echo "glance-api glance/endpoint-ip string $glancehost" >> /tmp/glance-seed.txt
 echo "glance-api glance/region-name string $endpointsregion" >> /tmp/glance-seed.txt
 echo "glance-api glance/register-endpoint boolean false" >> /tmp/glance-seed.txt
-echo "glance-common glance/admin-user	string $keystoneadminuser" >> /tmp/glance-seed.txt
+echo "glance-common glance/admin-user   string $keystoneadminuser" >> /tmp/glance-seed.txt
 echo "glance-common glance/configure_db boolean false" >> /tmp/glance-seed.txt
 echo "glance-common glance/rabbit_host string $messagebrokerhost" >> /tmp/glance-seed.txt
 echo "glance-common glance/rabbit_password password $brokerpass" >> /tmp/glance-seed.txt
@@ -182,149 +182,192 @@ echo "heat-common heat/register-endpoint boolean false" >> /tmp/heat-seed.txt
 
 debconf-set-selections /tmp/heat-seed.txt
 
-echo ""
-echo "Instalando paquetes para Heat"
+echo "trove-common trove/configure_db boolean false" >> /tmp/trove-seed.txt
+echo "trove-common trove/admin-tenant-name string $troveuser" >> /tmp/trove-seed.txt
+echo "trove-common trove/admin-user string admin" >> /tmp/trove-seed.txt
+echo "trove-common trove/auth-host string $keystonehost" >> /tmp/trove-seed.txt
+echo "trove-api trove/register-endpoint boolean false" >> /tmp/trove-seed.txt
+echo "trove-common trove/admin-password password $trovepass" >> /tmp/trove-seed.txt
 
-aptitude -y install heat-api heat-api-cfn heat-engine
-aptitude -y install heat-cfntools
+debconf-set-selections /tmp/trove-seed.txt
+
+
+echo ""
+echo "Instalando paquetes para Trove"
+
+aptitude -y install python-trove python-troveclient python-glanceclient \
+	trove-common trove-api trove-taskmanager
 
 echo "Listo"
 echo ""
 
 rm -f /tmp/*.seed.txt
 
+stop trove-taskmanager
+stop trove-taskmanager
+stop trove-api
+stop trove-api
+
+rm -f /var/lib/trove/trovedb
+
 source $keystone_admin_rc_file
 
 echo ""
-echo "Configurando Heat"
+echo "Configurando Trove"
 echo ""
 
-stop heat-api
-stop heat-api-cfn
-stop heat-engine
+cat ./libs/trove/trove.conf > /etc/trove/trove.conf
+cat ./libs/trove/trove-taskmanager.conf > /etc/trove/trove-taskmanager.conf
+cat ./libs/trove/api-paste.ini > /etc/trove/api-paste.ini
 
-mkdir -p /etc/heat/environment.d
+sync
+sleep 5
+sync
 
-# Temporal - aparentemente el paquete no instala el api-paste.ini
+commonfile="/etc/trove/trove.conf
+	/etc/trove/trove-taskmanager.conf
+"
 
-cat ./libs/heat/api-paste.ini > /etc/heat/api-paste.ini
+for myconffile in $commonfile
+do
+	# Failsafe por si el archivo no está !!!
+	echo "#" >> $myconffile
 
-chown -R heat.heat /etc/heat
+	case $dbflavor in
+	"mysql")
+		# crudini --set $myconffile database connection mysql://$trovedbuser:$trovedbpass@$dbbackendhost:$mysqldbport/$trovedbname
+		crudini --set $myconffile DEFAULT sql_connection mysql://$trovedbuser:$trovedbpass@$dbbackendhost:$mysqldbport/$trovedbname
+		;;
+	"postgres")
+		# crudini --set $myconffile database connection postgresql://$trovedbuser:$trovedbpass@$dbbackendhost:$psqldbport/$trovedbname
+		crudini --set $myconffile DEFAULT sql_connection postgresql://$trovedbuser:$trovedbpass@$dbbackendhost:$psqldbport/$trovedbname
+		;;
+	esac
 
-# if [ -f /etc/heat/api-paste.ini ]
-#then
-#	crudini --set /etc/heat/api-paste.ini "filter:authtoken" paste.filter_factory "heat.common.auth_token:filter_factory"
-#	crudini --set /etc/heat/api-paste.ini "filter:authtoken" auth_host $keystonehost
-#	crudini --set /etc/heat/api-paste.ini "filter:authtoken" auth_port 35357
-#	crudini --set /etc/heat/api-paste.ini "filter:authtoken" auth_protocol http
-#	crudini --set /etc/heat/api-paste.ini "filter:authtoken" admin_tenant_name $keystoneservicestenant
-#	crudini --set /etc/heat/api-paste.ini "filter:authtoken" admin_user $heatuser
-#	crudini --set /etc/heat/api-paste.ini "filter:authtoken" admin_password $heatpass
-#fi
+	crudini --set $myconffile DEFAULT log_dir /var/log/trove
+	crudini --set $myconffile DEFAULT verbose False
+	crudini --set $myconffile DEFAULT debug False
+	crudini --set $myconffile DEFAULT control_exchange trove
+	crudini --set $myconffile DEFAULT trove_auth_url http://$keystonehost:5000/v2.0
+	crudini --set $myconffile DEFAULT nova_compute_url http://$novahost:8774/v2
+	crudini --set $myconffile DEFAULT cinder_url http://$cinderhost:8776/v1
+	crudini --set $myconffile DEFAULT swift_url http://$swifthost:8080/v1/AUTH_
+	crudini --set $myconffile DEFAULT notifier_queue_hostname $messagebrokerhost
 
-echo "# Heat Main Config" >> /etc/heat/heat.conf
+	case $brokerflavor in
+	"qpid")
+        	crudini --set $myconffile DEFAULT rpc_backend trove.openstack.common.rpc.impl_qpid
+        	# crudini --set $myconffile DEFAULT rpc_backend qpid
+	        crudini --set $myconffile DEFAULT qpid_reconnect_interval_min 0
+	        crudini --set $myconffile DEFAULT qpid_username $brokeruser
+	        crudini --set $myconffile DEFAULT qpid_tcp_nodelay True
+	        crudini --set $myconffile DEFAULT qpid_protocol tcp
+	        crudini --set $myconffile DEFAULT qpid_hostname $messagebrokerhost
+	        crudini --set $myconffile DEFAULT qpid_password $brokerpass
+	        crudini --set $myconffile DEFAULT qpid_port 5672
+	        crudini --set $myconffile DEFAULT qpid_topology_version 1
+        	;;
 
-case $dbflavor in
-"mysql")
-	crudini --set /etc/heat/heat.conf database connection mysql://$heatdbuser:$heatdbpass@$dbbackendhost:$mysqldbport/$heatdbname
-;;
-"postgres")
-	crudini --set /etc/heat/heat.conf database connection postgresql://$heatdbuser:$heatdbpass@$dbbackendhost:$psqldbport/$heatdbname
-;;
-esac
- 
-crudini --set /etc/heat/heat.conf DEFAULT host $heathost
-crudini --set /etc/heat/heat.conf DEFAULT debug false
-crudini --set /etc/heat/heat.conf DEFAULT verbose false
-crudini --set /etc/heat/heat.conf DEFAULT log_dir /var/log/heat
- 
-# Nuevo para Icehouse
-crudini --set /etc/heat/heat.conf DEFAULT heat_metadata_server_url http://$heathost:8000
-crudini --set /etc/heat/heat.conf DEFAULT heat_waitcondition_server_url http://$heathost:8000/v1/waitcondition
-crudini --set /etc/heat/heat.conf DEFAULT heat_watch_server_url http://$heathost:8003
-crudini --set /etc/heat/heat.conf DEFAULT heat_stack_user_role heat_stack_user
-crudini --set /etc/heat/heat.conf DEFAULT auth_encryption_key $heatencriptionkey
-crudini --set /etc/heat/heat.conf DEFAULT use_syslog False
-crudini --set /etc/heat/heat.conf DEFAULT heat_api_cloudwatch bind_host 0.0.0.0
-crudini --set /etc/heat/heat.conf DEFAULT heat_api_cloudwatch bind_port 8003
+	"rabbitmq")
+	        crudini --set $myconffile DEFAULT rpc_backend trove.openstack.common.rpc.impl_kombu
+	        # crudini --set $myconffile DEFAULT rpc_backend rabbit
+        	crudini --set $myconffile DEFAULT rabbit_host $messagebrokerhost
+	        crudini --set $myconffile DEFAULT rabbit_userid $brokeruser
+	        crudini --set $myconffile DEFAULT rabbit_password $brokerpass
+	        crudini --set $myconffile DEFAULT rabbit_port 5672
+	        crudini --set $myconffile DEFAULT rabbit_use_ssl false
+	        crudini --set $myconffile DEFAULT rabbit_virtual_host $brokervhost
+		crudini --set $myconffile DEFAULT notifier_queue_userid $brokeruser
+		crudini --set $myconffile DEFAULT notifier_queue_password $brokerpass
+		crudini --set $myconffile DEFAULT notifier_queue_ssl false
+		crudini --set $myconffile DEFAULT notifier_queue_port 5672
+		crudini --set $myconffile DEFAULT notifier_queue_virtual_host $brokervhost
+		crudini --set $myconffile DEFAULT notifier_queue_transport memory
+        	;;
+	esac
 
-crudini --del /etc/heat/heat.conf keystone_authtoken admin_tenant_name
-crudini --del /etc/heat/heat.conf keystone_authtoken admin_user
-crudini --del /etc/heat/heat.conf keystone_authtoken admin_password
-crudini --del /etc/heat/heat.conf keystone_authtoken auth_host
-crudini --del /etc/heat/heat.conf keystone_authtoken auth_port
-crudini --del /etc/heat/heat.conf keystone_authtoken auth_protocol
-crudini --del /etc/heat/heat.conf keystone_authtoken auth_uri
-crudini --del /etc/heat/heat.conf keystone_authtoken signing_dir
+done
 
-crudini --del /etc/heat/heat.conf keystone_authtoken admin_tenant_name
-crudini --del /etc/heat/heat.conf keystone_authtoken admin_user
-crudini --del /etc/heat/heat.conf keystone_authtoken admin_password
-crudini --del /etc/heat/heat.conf keystone_authtoken auth_host
-crudini --del /etc/heat/heat.conf keystone_authtoken auth_port
-crudini --del /etc/heat/heat.conf keystone_authtoken auth_protocol
-crudini --del /etc/heat/heat.conf keystone_authtoken auth_uri
-crudini --del /etc/heat/heat.conf keystone_authtoken signing_dir
+crudini --set /etc/trove/trove-taskmanager.conf DEFAULT nova_proxy_admin_user $keystoneadminuser
+crudini --set /etc/trove/trove-taskmanager.conf DEFAULT nova_proxy_admin_pass $keystoneadminpass
+crudini --set /etc/trove/trove-taskmanager.conf DEFAULT nova_proxy_admin_tenant_name $keystoneadmintenant
 
-crudini --set /etc/heat/heat.conf keystone_authtoken admin_tenant_name $keystoneservicestenant
-crudini --set /etc/heat/heat.conf keystone_authtoken admin_user $heatuser
-crudini --set /etc/heat/heat.conf keystone_authtoken admin_password $heatpass
-crudini --set /etc/heat/heat.conf keystone_authtoken auth_host $keystonehost
-crudini --set /etc/heat/heat.conf keystone_authtoken auth_port 35357
-crudini --set /etc/heat/heat.conf keystone_authtoken auth_protocol http
-crudini --set /etc/heat/heat.conf keystone_authtoken auth_uri http://$keystonehost:5000/v2.0/
-crudini --set /etc/heat/heat.conf keystone_authtoken signing_dir /tmp/keystone-signing-heat
+# crudini --set /etc/trove/trove-conductor.conf DEFAULT nova_proxy_admin_user $keystoneadminuser
+# crudini --set /etc/trove/trove-conductor.conf DEFAULT nova_proxy_admin_pass $keystoneadminpass
+# crudini --set /etc/trove/trove-conductor.conf DEFAULT nova_proxy_admin_tenant_name $keystoneadmintenant
 
-crudini --set /etc/heat/heat.conf ec2authtoken auth_uri http://$keystonehost:5000/v2.0/
- 
-crudini --set /etc/heat/heat.conf DEFAULT control_exchange openstack
- 
-case $brokerflavor in
-"qpid")
-	crudini --set /etc/heat/heat.conf DEFAULT rpc_backend heat.openstack.common.rpc.impl_qpid
-	crudini --set /etc/heat/heat.conf DEFAULT qpid_reconnect_interval_min 0
-	crudini --set /etc/heat/heat.conf DEFAULT qpid_username $brokeruser
-	crudini --set /etc/heat/heat.conf DEFAULT qpid_tcp_nodelay True
-	crudini --set /etc/heat/heat.conf DEFAULT qpid_protocol tcp
-	crudini --set /etc/heat/heat.conf DEFAULT qpid_hostname $messagebrokerhost
-	crudini --set /etc/heat/heat.conf DEFAULT qpid_password $brokerpass
-	crudini --set /etc/heat/heat.conf DEFAULT qpid_port 5672
-	crudini --set /etc/heat/heat.conf DEFAULT qpid_topology_version 1
-	;;
- 
-"rabbitmq")
-	crudini --set /etc/heat/heat.conf DEFAULT rpc_backend heat.openstack.common.rpc.impl_kombu
-	crudini --set /etc/heat/heat.conf DEFAULT rabbit_host $messagebrokerhost
-	crudini --set /etc/heat/heat.conf DEFAULT rabbit_userid $brokeruser
-	crudini --set /etc/heat/heat.conf DEFAULT rabbit_password $brokerpass
-	crudini --set /etc/heat/heat.conf DEFAULT rabbit_port 5672
-	crudini --set /etc/heat/heat.conf DEFAULT rabbit_use_ssl false
-	crudini --set /etc/heat/heat.conf DEFAULT rabbit_virtual_host $brokervhost
-	;;
-esac
+crudini --set /etc/trove/trove.conf DEFAULT default_datastore mysql
+crudini --set /etc/trove/trove.conf DEFAULT add_addresses True
+crudini --set /etc/trove/trove.conf DEFAULT network_label_regex "^NETWORK_LABEL$"
+crudini --set /etc/trove/trove.conf DEFAULT api_paste_config /etc/trove/api-paste.ini
+crudini --set /etc/trove/trove.conf DEFAULT bind_host 0.0.0.0
+crudini --set /etc/trove/trove.conf DEFAULT bind_port 8779
+
+troveworkers=`grep processor.\*: /proc/cpuinfo |wc -l`
+
+crudini --set /etc/trove/trove.conf DEFAULT trove_api_workers $troveworkers
+
+# crudini --set /etc/trove/api-paste.ini filter:authtoken admin_tenant_name $keystoneservicestenant
+crudini --set /etc/trove/api-paste.ini filter:authtoken admin_tenant_name $troveuser
+crudini --set /etc/trove/api-paste.ini filter:authtoken admin_user $troveuser
+crudini --set /etc/trove/api-paste.ini filter:authtoken admin_password $trovepass
+crudini --set /etc/trove/api-paste.ini filter:authtoken auth_host $keystonehost
+crudini --set /etc/trove/api-paste.ini filter:authtoken auth_port 35357
+crudini --set /etc/trove/api-paste.ini filter:authtoken auth_protocol http
+crudini --set /etc/trove/api-paste.ini filter:authtoken auth_uri http://$keystonehost:5000/v2.0/
+crudini --set /etc/trove/api-paste.ini filter:authtoken signing_dir /var/cache/trove
+
+crudini --set /etc/trove/api-paste.ini DEFAULT trove_api_workers $troveworkers
+
+# crudini --set /etc/trove/trove.conf keystone_authtoken admin_tenant_name $keystoneservicestenant
+crudini --set /etc/trove/trove.conf keystone_authtoken admin_tenant_name $troveuser
+crudini --set /etc/trove/trove.conf keystone_authtoken admin_user $troveuser
+crudini --set /etc/trove/trove.conf keystone_authtoken admin_password $trovepass
+crudini --set /etc/trove/trove.conf keystone_authtoken auth_host $keystonehost
+crudini --set /etc/trove/trove.conf keystone_authtoken auth_port 35357
+crudini --set /etc/trove/trove.conf keystone_authtoken auth_protocol http
+crudini --set /etc/trove/trove.conf keystone_authtoken auth_uri http://$keystonehost:5000/v2.0/
+crudini --set /etc/trove/trove.conf keystone_authtoken signing_dir /var/cache/trove
+
+
+mkdir -p /var/cache/trove
+chown -R trove.trove /var/cache/trove
+chown trove.trove /etc/trove/*
+chmod 700 /var/cache/trove
+chmod 700 /var/log/trove
+
+touch /var/log/trove/trove-manage.log
+chown trove.trove /var/log/trove/*
 
 echo ""
-echo "Heat Configurado"
+echo "Trove Configurado"
 echo ""
 
 #
 # Se aprovisiona la base de datos
 echo ""
-echo "Aprovisionando/inicializando BD de HEAT"
+echo "Aprovisionando/inicializando BD de TROVE"
 echo ""
-chown -R heat.heat /var/log/heat /etc/heat
-# su - heat -c "heat-manage db_sync"
-heat-manage db_sync
-chown -R heat.heat /var/log/heat /etc/heat
+
+su -s /bin/sh -c "trove-manage db_sync" trove
+
+#
+# Y se crea el datastore de MySQL
+echo ""
+echo "Creando datastore de TROVE en MySQL"
+echo ""
+
+su -s /bin/sh -c "trove-manage datastore_update mysql ''" trove
 
 echo ""
 echo "Listo"
 echo ""
 
+
 echo ""
 echo "Aplicando reglas de IPTABLES"
 
-iptables -A INPUT -p tcp -m multiport --dports 8000,8004 -j ACCEPT
+iptables -A INPUT -p tcp -m multiport --dports 8779 -j ACCEPT
 /etc/init.d/iptables-persistent save
 
 echo "Listo"
@@ -333,26 +376,22 @@ echo ""
 echo "Activando Servicios"
 echo ""
 
-start heat-api
-start heat-api-cfn
-start heat-engine
+start trove-api
+start trove-taskmanager
 
-testheat=`dpkg -l heat-api 2>/dev/null|tail -n 1|grep -ci ^ii`
-if [ $testheat == "0" ]
+testtrove=`dpkg -l trove-api 2>/dev/null|tail -n 1|grep -ci ^ii`
+if [ $testtrove == "0" ]
 then
-	echo ""
-	echo "Falló la instalación de heat - abortando el resto de la instalación"
-	echo ""
-	exit 0
+        echo ""
+        echo "Falló la instalación de trove - abortando el resto de la instalación"
+        echo ""
+        exit 0
 else
-	date > /etc/openstack-control-script-config/heat-installed
-	date > /etc/openstack-control-script-config/heat
+        date > /etc/openstack-control-script-config/trove-installed
+        date > /etc/openstack-control-script-config/trove
 fi
 
-
 echo ""
-echo "Heat Instalado"
+echo "Trove Instalado"
 echo ""
-
-
 

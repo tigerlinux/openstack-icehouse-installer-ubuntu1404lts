@@ -11,8 +11,8 @@
 # Primera versión para Icehouse (ubuntu): Abril 23 del 2014
 #
 # Script principal
-# Versión 1.0.2.ub1404lts "Snow Lynx"
-# 27 de Abril del 2014
+# Versión 1.1.0.ub1404lts "Snow Lynx"
+# 07 de Mayo del 2014
 #
 
 PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
@@ -43,7 +43,7 @@ case $1 in
 	echo "INSTALADOR DE OPENSTACK ICEHOUSE PARA UBUNTU SERVER 14.04 LTS"
 	echo "Realizado por Reynaldo R. Martinez P."
 	echo "E-Mail: TigerLinux@Gmail.com"
-	echo "Versión 1.0.2.ub1404lts \"Snow Lynx\" - Abril 27, 2014"
+	echo "Versión 1.1.0.ub1404lts \"Snow Lynx\" - Mayo 07, 2014"
 	echo ""
 	echo "Se verificaran los prerequisitos"
 	echo "Si alguno de los prerequisitos falla, se informará y se detendrá el proceso"
@@ -348,6 +348,40 @@ case $1 in
                         exit 0
                 fi
         fi
+
+        case $dbflavor in
+        "mysql")
+                if [ $troveinstall == "yes" ]
+                then
+                        echo ""
+                        echo "Instalando trove"
+
+                        ./modules/troveinstall.sh
+
+                        if [ -f /etc/openstack-control-script-config/trove-installed ]
+                        then
+                                echo "trove exitosamente instalado"
+                        else
+                                echo ""
+                                echo "Falló el módulo de instalación de trove"
+                                echo "Abortando el resto de la instalación"
+                                echo ""
+                                exit 0
+                        fi
+                fi
+                ;;
+        "postgres")
+                if [ $troveinstall == "yes" ]
+                then
+                        echo ""
+                        echo "Ha elegido instalar Trove con PostgreSQL como Backend de Base de datos"
+                        echo "Esta opción aun no está soportada por nuestro instalador"
+                        echo "La instalación continuará sin trove"
+                        echo ""
+                        sleep 10
+                fi
+                ;;
+        esac
 
 	if [ $snmpinstall == "yes" ]
 	then

@@ -31,7 +31,7 @@ then
 fi
 
 echo ""
-echo "Instalando paquetes base de Python para manejo de Bases de Datos"
+echo "Instalando requerimientos adicionales" 
 echo ""
 aptitude -y install python-sqlalchemy python-sqlalchemy-ext \
 	python-psycopg2 python-mysqldb python-keystoneclient python-keystone \
