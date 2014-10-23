@@ -11,8 +11,8 @@
 # Primera versión para Icehouse (ubuntu): Abril 23 del 2014
 #
 # Archivo de configuracion principal
-# Para el instalador versión 1.1.0.ub1404lts "Snow Lynx"
-# Mayo 07, 2014
+# Para el instalador versión 1.1.1.ub1404lts "Snow Lynx"
+# Octubre 22, 2014
 #
 
 #
@@ -261,6 +261,14 @@ neutron_in_compute_node="no"
 #
 #
 neutronhost="192.168.50.12"
+#
+# Si está usando neutron en un nodo de COMPUTE, coloque
+# la IP del nodo de compute en la siguiente variable. Si
+# se trata de un ALL-IN-ONE o un nodo de neutron (neutron-server), coloque
+# la misma IP que en la variable neutronhost:
+neutron_computehost="192.168.50.12"
+#
+#
 neutronuser="neutron"
 neutronsvce="neutron"
 neutronpass="P@ssw0rd"
@@ -330,6 +338,12 @@ nova_without_compute="no"
 #
 #
 novahost="192.168.50.12"
+#
+# Si está usando NOVA en un nodo de COMPUTE, coloque
+# la IP del nodo de compute en la siguiente variable. Si
+# se trata de un ALL-IN-ONE o un nodo de NOVA (nova server), coloque
+# la misma IP que en la variable novahost:
+nova_computehost="192.168.50.12"
 novauser="nova"
 novasvce="nova"
 novaec2svce="ec2"
@@ -418,7 +432,8 @@ mondbhost="127.0.0.1"
 mondbport="27017"
 mondbname="ceilometer"
 # Password del servicio de metering
-metering_secret="P@ssw0rd"
+# Regenerarlo con el comando: openssl rand -hex 10
+metering_secret="fe01a6ed3e04c4be1cd8"
 #
 # Si se va a instalar el módulo de alarmas, colocar
 # la siguiente variable en "yes"

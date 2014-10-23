@@ -7,21 +7,17 @@ Caracas, Venezuela.
 
 Este instalador fue realizado para automatizar las tareas de creación de una
 infraestructura de virtualización basada en OpenStack. Hasta el momento,
-existen tres "sabores" del instalador, uno para Debian 7, uno para Centos 6 y
-uno para Ubuntu 14.04 LTS.
+existen cuatro "sabores" del instalador, uno para Debian 7, uno para Centos 6,
+uno para Centos 7 y finalmente uno para Ubuntu 14.04 LTS.
 
-Las tres versiones producen un OpenStack utilizable en producción, pero recomen-
-damos dado que Icehouse aun está muy nuevo probar muy bien antes de colocarlo
-en ambientes de producción. Si tiene dudas, use Havana en producción e Icehouse
-en desarrollo y haga todas las pruebas que pueda antes de colocarlo en
-ambientes de producción "real".
+Las cuatro versiones producen un OpenStack utilizable en producción, pero recomen-
+damos en el caso de Centos 7 esperar a que el sistema operativo madure lo sufi-
+ciente antes de considerarlo realmente listo para producción.
 
 En resumen, este instalador puede producir un OpenStack Icehouse completamente
-utilizable en ambientes de producción, pero aun así recomendamos seguir usando
-las versiones para havana (centos6/debian7/Unbuntu1404lts) hasta que Icehouse
-madure lo suficiente !. Recuerde que el factor "bugs" no depende de nosotros,
-sino del proyecto OpenStack y de los proyectos que empaquetan para centos, debian
-y ubuntu.
+utilizable en ambientes de producción, sin embargo, recuerde que el factor "bugs"
+no depende de nosotros, sino del proyecto OpenStack y de los proyectos que 
+empaquetan para centos, debian y ubuntu.
 
 También tome en cuenta que "hasta la fecha" (y eso podría cambiar en el futuro)
 los paquetes de Centos (provistos por el proyecto RDO de RedHat) tienden a
@@ -293,7 +289,7 @@ active la opción de usar *dhcp*.
 > **Recomendación**: Trate de tener una buena estructura de "DNS" para sus máquinas
 > virtuales de manera que las pueda identificar de manera apropiada y utilice
 > las opciones de dnsmasq para agregar o separar subdominios para cada rango de
-> IP's.
+> direcciones IP.
 
 
 ### Modularización del Instalador
@@ -368,6 +364,29 @@ repositorios RDO.
 Si usted va a usar un manejador de base de datos externo basado en MySQL/MariaDB,
 ASEGURESE que sea la versión correcta (5.5) para no terminar con una instalación
 de OpenStack inservible !.
+
+
+#### Centos 7:
+
+1. Instale centos con la selección de paquetes para "Infraestructure Server" (ser-
+   vidor de infraestructura). Asegúrese de tener correctamente instalado, configu-
+   rado y operativo el servicio ntpd. Ser recomienda también usar ntpdate.
+
+2. Agregue los repositorios EPEL y RDO (ver "NOTAS.txt").
+
+3. Instale y configure OpenVSWitch (de nuevo, ver "NOTAS.txt").
+
+ALERTA: Esta versión de OpenStack no soporta MySQL menor a 5.5. Vea las notas
+y tome sus precauciones !.
+
+Si usted va a usar un manejador de base de datos externo basado en MySQL/MariaDB,
+ASEGURESE que sea la versión correcta (5.5) para no terminar con una instalación
+de OpenStack inservible !.
+
+NOTA IMPORTANTE: El instalador de Centos 7 desactiva SELINUX. Esto se requiere para
+evitar problemas encontrados especialmente cuando se utilizar PostgreSQL como backend
+de base de datos.
+
 
 #### Debian 7:
 

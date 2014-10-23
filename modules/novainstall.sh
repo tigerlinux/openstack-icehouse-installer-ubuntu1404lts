@@ -309,6 +309,7 @@ crudini --set /etc/nova/nova.conf DEFAULT iscsi_helper tgtadm
 crudini --set /etc/nova/nova.conf DEFAULT vif_plugging_timeout 10
 crudini --set /etc/nova/nova.conf DEFAULT vif_plugging_is_fatal False
 crudini --set /etc/nova/nova.conf DEFAULT control_exchange nova
+crudini --set /etc/nova/nova.conf DEFAULT host `hostname`
 
 #
 # Base de datos
@@ -349,7 +350,7 @@ crudini --set /etc/nova/nova.conf DEFAULT libvirt_vif_driver nova.virt.libvirt.v
 crudini --set /etc/nova/nova.conf DEFAULT neutron_region_name $endpointsregion
 crudini --set /etc/nova/nova.conf DEFAULT network_api_class nova.network.neutronv2.api.API
 crudini --set /etc/nova/nova.conf DEFAULT debug False
-crudini --set /etc/nova/nova.conf DEFAULT my_ip $novahost
+crudini --set /etc/nova/nova.conf DEFAULT my_ip $nova_computehost
 crudini --set /etc/nova/nova.conf DEFAULT neutron_auth_strategy keystone
 crudini --set /etc/nova/nova.conf DEFAULT neutron_admin_password $neutronpass
 crudini --set /etc/nova/nova.conf DEFAULT api_paste_config /etc/nova/api-paste.ini

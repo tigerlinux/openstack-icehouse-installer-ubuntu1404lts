@@ -146,7 +146,13 @@ crudini --set /etc/ceilometer/ceilometer.conf DEFAULT metering_api_port 8777
 crudini --set /etc/ceilometer/ceilometer.conf DEFAULT auth_strategy keystone
 crudini --set /etc/ceilometer/ceilometer.conf DEFAULT logdir /var/log/ceilometer
 crudini --set /etc/ceilometer/ceilometer.conf DEFAULT os_auth_region $endpointsregion
-crudini --set /etc/ceilometer/ceilometer.conf DEFAULT host $ceilometerhost
+# crudini --set /etc/ceilometer/ceilometer.conf DEFAULT host $ceilometerhost
+crudini --set /etc/ceilometer/ceilometer.conf DEFAULT host `hostname`
+crudini --set /etc/ceilometer/ceilometer.conf DEFAULT pipeline_cfg_file pipeline.yaml
+crudini --set /etc/ceilometer/ceilometer.conf DEFAULT collector_workers 2
+crudini --set /etc/ceilometer/ceilometer.conf DEFAULT notification_workers 2
+crudini --set /etc/ceilometer/ceilometer.conf DEFAULT hypervisor_inspector libvirt
+
  
 crudini --del /etc/ceilometer/ceilometer.conf DEFAULT sql_connection
  

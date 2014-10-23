@@ -111,7 +111,7 @@ debconf-set-selections /tmp/cinder-seed.txt
 echo "neutron-common neutron/admin-password password $keystoneadminpass" > /tmp/neutron-seed.txt
 echo "neutron-metadata-agent neutron/admin-password password $keystoneadminpass" >> /tmp/neutron-seed.txt
 echo "neutron-server neutron/keystone-ip string $keystonehost" >> /tmp/neutron-seed.txt
-echo "neutron-plugin-openvswitch neutron-plugin-openvswitch/local_ip string $neutronhost" >> /tmp/neutron-seed.txt
+echo "neutron-plugin-openvswitch neutron-plugin-openvswitch/local_ip string $neutron_computehost" >> /tmp/neutron-seed.txt
 echo "neutron-plugin-openvswitch neutron-plugin-openvswitch/configure_db boolean false" >> /tmp/neutron-seed.txt
 echo "neutron-metadata-agent neutron/region-name string $endpointsregion" >> /tmp/neutron-seed.txt
 echo "neutron-server neutron/region-name string $endpointsregion" >> /tmp/neutron-seed.txt
@@ -135,7 +135,7 @@ echo "neutron-common neutron/tenant_network_type select vlan" >> /tmp/neutron-se
 echo "neutron-common neutron/enable_tunneling boolean false" >> /tmp/neutron-seed.txt
 echo "neutron-common neutron/configure_db boolean false" >> /tmp/neutron-seed.txt
 echo "neutron-common neutron/plugin-select select OpenVSwitch" >> /tmp/neutron-seed.txt
-echo "neutron-common neutron/local_ip string $neutronhost" >> /tmp/neutron-seed.txt
+echo "neutron-common neutron/local_ip string $neutron_computehost" >> /tmp/neutron-seed.txt
 
 
 debconf-set-selections /tmp/neutron-seed.txt
@@ -494,7 +494,7 @@ crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup enable_securit
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs enable_tunneling False
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs network_vlan_ranges $network_vlan_ranges
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs local_ip $neutronhost
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs local_ip $neutron_computehost
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs bridge_mappings $bridge_mappings
 
 case $dbflavor in

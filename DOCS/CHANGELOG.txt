@@ -1,3 +1,9 @@
+1.1.1.ub1404lts - 22-Octubre-2014
+- Mejoras generales para metricas de cpu, red y disco
+  entre nova-compute y ceilometer.
+- Mejoras para instalación en ambientes con múltiples
+  nodos de compute.
+
 1.1.0.ub1404lts - 07-Mayo-2014
 - Se agrega Trove como opción para instalación en
   calidad de "Experimental".
