@@ -1,3 +1,6 @@
+1.1.2.ub1404lts - 22-Octubre-2014
+- Corrección adicional para Ceilometer
+
 1.1.1.ub1404lts - 22-Octubre-2014
 - Mejoras generales para metricas de cpu, red y disco
   entre nova-compute y ceilometer.
