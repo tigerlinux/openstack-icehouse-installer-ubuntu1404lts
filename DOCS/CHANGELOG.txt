@@ -1,3 +1,12 @@
+1.1.3.ub1404lts - 29-Noviembre-2014
+- Mejoras en módulo de instalación de ceilometer para
+  casos de múltiples nodos de compute o controladores
+  puros.
+- Selección de "token flavor" (uuid o pki) para Keystone
+  controlable por la configuración del instalador.
+- Mejoras en la documentación para reflejar los cambios
+  en el módulo de instalación de ceilometer.
+
 1.1.2.ub1404lts - 22-Octubre-2014
 - Corrección adicional para Ceilometer
 

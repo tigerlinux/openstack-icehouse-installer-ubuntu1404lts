@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Instalador desatendido para Openstack Icehouse sobre Ubuntu
+# Instalador desatendido para Openstack Icehouse sobre Ubuntu 14.04lts
 # Reynaldo R. Martinez P.
 # E-Mail: TigerLinux@Gmail.com
 # Primera versión (Grizzly): Julio 18 del 2013
@@ -11,7 +11,7 @@
 # Primera versión para Icehouse (ubuntu): Abril 23 del 2014
 #
 # Script principal
-# Versión 1.1.2.ub1404lts "Snow Lynx"
+# Versión 1.1.3.ub1404lts "Snow Lynx"
 # 22 de Octubre del 2014
 #
 
@@ -43,7 +43,7 @@ case $1 in
 	echo "INSTALADOR DE OPENSTACK ICEHOUSE PARA UBUNTU SERVER 14.04 LTS"
 	echo "Realizado por Reynaldo R. Martinez P."
 	echo "E-Mail: TigerLinux@Gmail.com"
-	echo "Versión 1.1.2.ub1404lts \"Snow Lynx\" - Octubre 22, 2014"
+	echo "Versión 1.1.3.ub1404lts \"Snow Lynx\" - Noviembre 29, 2014"
 	echo ""
 	echo "Se verificaran los prerequisitos"
 	echo "Si alguno de los prerequisitos falla, se informará y se detendrá el proceso"

@@ -129,15 +129,21 @@ esac
 
 crudini --set /etc/keystone/keystone.conf sql idle_timeout 200
 crudini --set /etc/keystone/keystone.conf catalog driver keystone.catalog.backends.sql.Catalog
-crudini --set /etc/keystone/keystone.conf token provider keystone.token.providers.pki.Provider
+crudini --set /etc/keystone/keystone.conf token provider keystone.token.providers.uuid.Provider
 crudini --set /etc/keystone/keystone.conf token expiration 86400
 crudini --set /etc/keystone/keystone.conf token driver keystone.token.backends.sql.Token
 
-chown -R keystone:keystone /var/log/keystone
-
-keystone-manage pki_setup --keystone-user keystone --keystone-group keystone
-
-chown -R keystone:keystone /var/log/keystone /etc/keystone/ssl
+case $keystonetokenflavor in
+"pki")
+	chown -R keystone:keystone /var/log/keystone
+	keystone-manage pki_setup --keystone-user keystone --keystone-group keystone
+	chown -R keystone:keystone /var/log/keystone /etc/keystone/ssl
+	crudini --set /etc/keystone/keystone.conf token provider keystone.token.providers.pki.Provider
+	;;
+"uuid")
+	crudini --set /etc/keystone/keystone.conf token provider keystone.token.providers.uuid.Provider
+	;;
+esac
 
 rm -f /var/lib/keystone/keystone.db
 

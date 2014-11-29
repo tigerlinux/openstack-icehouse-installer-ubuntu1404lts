@@ -131,16 +131,35 @@ else
 	alarm2=""
 	alarm3=""
 fi
-
-ceilometer_svc_start="
-	ceilometer-agent-compute
-	ceilometer-agent-central
-	ceilometer-api
-	ceilometer-collector
-	$alarm1
-	$alarm2
-	$alarm3
-"
+ 
+if [ -f /etc/openstack-control-script-config/ceilometer-full-installed ]
+then
+	if [ -f /etc/openstack-control-script-config/ceilometer-without-compute ]
+	then
+		ceilometer_svc_start="
+			ceilometer-agent-central
+			ceilometer-api
+			ceilometer-collector
+			$alarm1
+			$alarm2
+			$alarm3
+		"
+	else
+		ceilometer_svc_start="
+			ceilometer-agent-compute
+			ceilometer-agent-central
+			ceilometer-api
+			ceilometer-collector
+			$alarm1
+			$alarm2
+			$alarm3
+		"
+	fi
+else
+	ceilometer_svc_start="
+		ceilometer-agent-compute
+	"
+fi
 
 heat_svc_start='
 	heat-api

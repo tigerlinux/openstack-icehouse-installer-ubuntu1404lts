@@ -11,8 +11,8 @@
 # Primera versión para Icehouse (ubuntu): Abril 23 del 2014
 #
 # Archivo de configuracion principal
-# Para el instalador versión 1.1.2.ub1404lts "Snow Lynx"
-# Octubre 22, 2014
+# Para el instalador versión 1.1.3.ub1404lts "Snow Lynx"
+# Noviembre 29, 2014
 #
 
 #
@@ -141,6 +141,11 @@ keystoneservicestenant="services"
 keystonememberrole="Member"
 keystonereselleradminrole="ResellerAdmin"
 keystone_admin_rc_file="/root/keystonerc_admin"
+
+# Flavor para el tipo de proveedor de TOKEN para Keystone
+# Dos opciones: pki o uuid
+# Por defecto: uuid
+keystonetokenflavor="uuid"
 
 # Region para todos los endpoints
 # Ejemplo: MiSitioSecundarioDeOpenStack
@@ -418,6 +423,24 @@ libvirt_cpu_mode="host-passthrough"
 # a menos que realmente lo vaya a usar
 #
 ceilometerinstall="yes"
+# Si el nodo que está usted instalando es un nodo Ceilometer Completo (ejemplo, en
+# un controller o un nodo de ceilometer) la siguiente variable debe estar en "no".
+# Si en cambio usted está instalando un nodo de "Compute" (con Nova), la variable
+# debe ir en "yes" para incluir sólamente el soporte del agente de ceilometer para
+# recolectar datos de Nova Compute.
+# En resumen:
+# Controller, All-In-One o Nodo de Ceilometer: "no"
+# Nodo de Compute con agente de ceilometer: "yes"
+ceilometer_in_compute_node="no"
+#
+#
+# Adicionalmente, si va a instalar un controller o nodo de ceilometer sin servicio
+# de compute, coloque la siguiente variable en "yes" y el servicio de recolección de
+# datos de ceilometer para compute no iniciará en el servidor. Caso contrario, déjela
+# como está en "no".
+#
+ceilometer_without_compute="no"
+#
 ceilometerhost="192.168.50.12"
 ceilometeruser="ceilometer"
 ceilometersvce="ceilometer"

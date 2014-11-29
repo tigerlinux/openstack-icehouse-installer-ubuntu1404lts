@@ -62,13 +62,15 @@ echo ""
 echo "Instalando paquetes para Ceilometer"
 echo ""
 
-echo "Instalando y configurando backend de base de datos MongoDB"
-echo ""
-aptitude -y install mongodb mongodb-clients mongodb-dev mongodb-server
-aptitude -y install libsnappy1 libgoogle-perftools4
-# dpkg -i libs/mongodb/*.deb
+if [ $ceilometer_in_compute_node = "no" ]
+then
+	echo "Instalando y configurando backend de base de datos MongoDB"
+	echo ""
+	aptitude -y install mongodb mongodb-clients mongodb-dev mongodb-server
+	aptitude -y install libsnappy1 libgoogle-perftools4
 
-restart mongodb
+	restart mongodb
+fi
 
 
 echo "ceilometer-api ceilometer/register-endpoint boolean false" > /tmp/ceilometer-seed.txt
@@ -89,28 +91,47 @@ echo ""
 echo "Instalando paquetes de Ceilometer"
 echo ""
 
-aptitude -y install ceilometer-agent-central ceilometer-agent-compute ceilometer-api \
-	ceilometer-collector ceilometer-common python-ceilometer python-ceilometerclient \
-	libnspr4 libnspr4-dev python-libxslt1
-
-if [ $ceilometeralarms == "yes" ]
+if [ $ceilometer_in_compute_node == "no" ]
 then
-	aptitude -y install ceilometer-alarm-evaluator ceilometer-alarm-notifier ceilometer-agent-notification
+	echo ""
+	echo "Paquetes para Controller o ALL-IN-ONE"
+	echo ""
+ 
+	aptitude -y install ceilometer-agent-central ceilometer-agent-compute ceilometer-api \
+		ceilometer-collector ceilometer-common python-ceilometer python-ceilometerclient \
+		libnspr4 libnspr4-dev python-libxslt1
+ 
+	if [ $ceilometeralarms == "yes" ]
+	then
+		aptitude -y install ceilometer-alarm-evaluator ceilometer-alarm-notifier ceilometer-agent-notification
+	fi
+else
+	aptitude -y install ceilometer-agent-compute libnspr4 libnspr4-dev python-libxslt1
 fi
 
+if [ $ceilometer_in_compute_node = "no" ]
+then
+	sed -i "s/127.0.0.1/$mondbhost/g" /etc/mongodb.conf
+	restart mongodb
+fi
 echo "Listo"
 echo ""
 
-stop ceilometer-agent-central
-stop ceilometer-agent-compute
-stop ceilometer-api
-stop ceilometer-collector
-
-if [ $ceilometeralarms == "yes" ]
+if [ $ceilometer_in_compute_node == "no" ]
 then
-	stop ceilometer-alarm-evaluator
-	stop ceilometer-alarm-notifier
-	stop ceilometer-agent-notification
+	stop ceilometer-agent-central
+	stop ceilometer-agent-compute
+	stop ceilometer-api
+	stop ceilometer-collector
+ 
+	if [ $ceilometeralarms == "yes" ]
+	then
+		stop ceilometer-alarm-evaluator
+		stop ceilometer-alarm-notifier
+		stop ceilometer-agent-notification
+	fi
+else
+	stop ceilometer-agent-compute
 fi
 
 source $keystone_admin_rc_file
@@ -259,16 +280,42 @@ sync
 sleep 5
 sync
 
-start ceilometer-agent-compute
-start ceilometer-agent-central
-start ceilometer-api
-start ceilometer-collector
-
-if [ $ceilometeralarms == "yes" ]
+if [ $ceilometer_in_compute_node == "no" ]
 then
-	start ceilometer-alarm-notifier
-	start ceilometer-alarm-evaluator
-	start ceilometer-agent-notification
+ 
+	stop mongodb
+	sync
+	sleep 5
+	sync
+	start mongodb
+	sync
+	sleep 5
+	sync
+ 
+	if [ $ceilometer_without_compute == "no" ]
+	then
+		start ceilometer-agent-compute
+		rm -f /etc/init/ceilometer-agent-compute.override
+	else
+		stop ceilometer-agent-compute
+		echo 'manual' > /etc/init/ceilometer-agent-compute.override
+	fi
+ 
+	start ceilometer-agent-central
+	start ceilometer-api
+	start ceilometer-collector
+ 
+	if [ $ceilometeralarms == "yes" ]
+	then
+		start ceilometer-alarm-notifier
+		start ceilometer-alarm-evaluator
+		start ceilometer-agent-notification
+	fi
+ 
+else
+	start ceilometer-agent-compute
+	rm -f /etc/init/ceilometer-agent-compute.override
+	restart ceilometer-agent-compute
 fi
 
 testceilometer=`dpkg -l ceilometer-api 2>/dev/null|tail -n 1|grep -ci ^ii`
@@ -284,6 +331,17 @@ else
 	if [ $ceilometeralarms == "yes" ]
 	then
 		date > /etc/openstack-control-script-config/ceilometer-installed-alarms
+	fi
+	if [ $ceilometer_in_compute_node == "no" ]
+	then
+		date > /etc/openstack-control-script-config/ceilometer-full-installed
+	fi
+	if [ $ceilometer_without_compute == "yes" ]
+	then
+		if [ $ceilometer_in_compute_node == "no" ]
+		then
+			date > /etc/openstack-control-script-config/ceilometer-without-compute
+		fi
 	fi
 fi
 
