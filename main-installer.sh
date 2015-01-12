@@ -12,7 +12,7 @@
 #
 # Script principal
 # Versión 1.1.3.ub1404lts "Snow Lynx"
-# 22 de Octubre del 2014
+# 11 de Enero del 2015
 #
 
 PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
@@ -43,7 +43,7 @@ case $1 in
 	echo "INSTALADOR DE OPENSTACK ICEHOUSE PARA UBUNTU SERVER 14.04 LTS"
 	echo "Realizado por Reynaldo R. Martinez P."
 	echo "E-Mail: TigerLinux@Gmail.com"
-	echo "Versión 1.1.3.ub1404lts \"Snow Lynx\" - Noviembre 29, 2014"
+	echo "Versión 1.1.4.ub1404lts \"Snow Lynx\" - Enero 11, 2015"
 	echo ""
 	echo "Se verificaran los prerequisitos"
 	echo "Si alguno de los prerequisitos falla, se informará y se detendrá el proceso"

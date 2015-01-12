@@ -1,3 +1,7 @@
+1.1.4.ub1404lts - 11-Enero-2015
+- Se modifica la verificación de instalación de ceilometer
+  para adaptarlo a nodos de compute.
+
 1.1.3.ub1404lts - 29-Noviembre-2014
 - Mejoras en módulo de instalación de ceilometer para
   casos de múltiples nodos de compute o controladores
