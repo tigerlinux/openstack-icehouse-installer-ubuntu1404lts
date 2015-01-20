@@ -1,3 +1,9 @@
+1.1.5.ub1404lts - 19-Enero-2015
+- Se corrige un bug en los parámetros de VNC y SPICE en el
+  módulo de instalación de nova.
+- Se agrega documentación sobre implementación en ambientes
+  de VLAN's. Vea el archivo en el directorio DOCS.
+
 1.1.4.ub1404lts - 11-Enero-2015
 - Se modifica la verificación de instalación de ceilometer
   para adaptarlo a nodos de compute.
